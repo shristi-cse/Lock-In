@@ -1,0 +1,30 @@
+{
+  "name": "lock-in",
+  "version": "1.0.0",
+  "description": "A cute pixel-art Pomodoro focus timer",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "watch": "nodemon --exec electron .",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "electron-window-state": "^5.0.3"
+  },
+  "devDependencies": {
+    "electron": "^44.2.0",
+    "nodemon": "^3.1.14",
+    "electron-builder": "^26.15.3"
+  },
+  "build":{
+    "appId": "com.lockin.app",
+    "productName": "Lock In",
+    "win": {
+      "icon": "assets/icons/app-icon.ico",
+      "target": "nsis"
+    }
+  }
+}
