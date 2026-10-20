@@ -1,5 +1,6 @@
 const {app, BrowserWindow, ipcMain} = require('electron');
 const path = require('path');
+app.commandLine.appendSwitch('force-device-scale-factor', '1');
 
 function createWindow()
 {
@@ -19,6 +20,8 @@ function createWindow()
             nodeIntegration: false
         }
     });
+    win.webContents.setZoomFactor(1);
+    win.webContents.setVisualZoomLevelLimits(1, 1);
     win.loadFile('index.html');
 
     win.webContents.on('before-input-event',(event, input)=>{

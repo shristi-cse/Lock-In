@@ -1,7 +1,7 @@
 const screen = document.getElementById("screen-content");
 const startBtn = document.getElementById("start-btn");
 
-document.getElementById('close-btn').addEventListener('click', ()=>{
+document.getElementById('close-btn').addEventListener('click', () => {
   window.electronAPI.closeWindow();
 });
 
@@ -58,6 +58,8 @@ startBtn.addEventListener("click", () => {
   const TEST_MODE = false;
   let timeLeft = TEST_MODE ? 10 : 25 * 60;
   let timerInterval;
+  let endTime;
+  let pausedTime;
 
   const timerDisplay = document.getElementById("timer-display");
 
@@ -77,17 +79,24 @@ startBtn.addEventListener("click", () => {
     if (timerInterval !== undefined) {
       return;
     }
+
+    // Set the actual time when this session should end
+    endTime = Date.now() + timeLeft * 1000;
+
     timerInterval = setInterval(() => {
-      if (timeLeft > 0) {
-        timeLeft--;
-        updateDisplay();
-      }
-      else {
+      timeLeft = Math.max(
+        0,
+        Math.ceil((endTime - Date.now()) / 1000)
+      );
+
+      updateDisplay();
+
+      if (timeLeft === 0) {
         clearInterval(timerInterval);
         timerInterval = undefined;
         showCompletionScreen();
       }
-    }, 1000);
+    }, 250);
   }
 
   startTimer();
@@ -96,30 +105,47 @@ startBtn.addEventListener("click", () => {
 
   pauseBtn.addEventListener("click", () => {
     playClickSound();
+
     if (timerInterval !== undefined) {
+      // Save the actual remaining time before pausing.
+      timeLeft = Math.max(
+        0,
+        Math.ceil((endTime - Date.now()) / 1000)
+      );
+
       clearInterval(timerInterval);
       timerInterval = undefined;
-      pauseBtn.textContent = "Resume";
 
+      updateDisplay();
+      pauseBtn.textContent = "Resume";
       hourglassGif.src = "assets/hourglass-paused.png";
-    }
-    else {
+    } else {
+      // Resume using the saved remaining time.
       hourglassGif.src = "assets/hourglass.gif";
-      startTimer();
       pauseBtn.textContent = "Pause";
+
+      if (timeLeft > 0) {
+        startTimer();
+      } else {
+        showCompletionScreen();
+      }
     }
   });
 
   restartBtn.addEventListener("click", () => {
     playClickSound();
+
     clearInterval(timerInterval);
     timerInterval = undefined;
+    endTime = undefined;
 
-    timeLeft = 25 * 60;
+    // Respect test mode when restarting.
+    timeLeft = TEST_MODE ? 10 : 25 * 60;
     updateDisplay();
 
     pauseBtn.textContent = "Pause";
     hourglassGif.src = "assets/hourglass.gif";
+
     startTimer();
   });
 });
